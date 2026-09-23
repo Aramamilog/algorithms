@@ -9,8 +9,7 @@ class Solution:
 
         # first decision
         # if s and t consist of lowercase English letters
-        # time O(len(s/t))
-        # memory O(52)
+
         # count_s = [0] * 26
         # count_t = [0] * 26
         # for s_char, t_char in zip(s, t):
@@ -23,8 +22,6 @@ class Solution:
         # return count_s == count_t
 
         # second decision
-        # time O(len(s/t))
-        # memory O(s) + O(t) = O(c)
         count_s = {}
         count_t = {}
         for i in range(len(s)):
@@ -35,3 +32,15 @@ class Solution:
                 return False
 
         return True
+
+
+sol = Solution()
+assert sol.isAnagram("anagram", "nagaram") == True
+assert sol.isAnagram("rat", "car") == False
+# first decision
+# time complexity O(len(s/t))
+# memory complexity O(52)
+
+# second decision
+# time complexity O(len(s/t))
+# memory complexity O(s) + O(t) = O(c)

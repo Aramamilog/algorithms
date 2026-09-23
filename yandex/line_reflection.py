@@ -25,18 +25,13 @@ class Solution:
         # Выход: true
         #
         # Вход: points = [[1,1],[-1,-1]]
-        #
         # Выход: false
-        # Требования:
         #
+        # Требования:
         # Временная сложность: O(n)
         # Пространственная сложность: O(n)
         # points length >= 1
 
-        ####################################################
-        # # time complexity: O(n)
-        # # memory complexity: O(n)
-        ####################################################
         points_set = {(x, y) for x, y in points}
 
         max_x = max(x for x, _ in points_set)
@@ -50,3 +45,10 @@ class Solution:
                 return False
 
         return True
+
+
+sol = Solution()
+assert sol.isReflected([[1,1],[-1,1]]) == True
+assert sol.isReflected([[1,1],[-1,-1]]) == False
+# time complexity O(n)
+# memory complexity O(n)

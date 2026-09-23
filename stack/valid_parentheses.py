@@ -4,8 +4,6 @@ from typing import List
 # https://leetcode.com/problems/valid-parentheses/
 class Solution:
     def isValid(self, s: str) -> bool:
-        # time O(s)
-        # memory O(s)
         stack = []
         close_to_open = {
             ')': '(',
@@ -23,3 +21,13 @@ class Solution:
                 stack.append(c)
 
         return not stack # corner case for a "({[" input
+
+
+sol = Solution()
+assert sol.isValid("()") == True
+assert sol.isValid("()[]{}") == True
+assert sol.isValid("(]") == False
+assert sol.isValid("([])") == True
+assert sol.isValid("([)]") == False
+# time complexity O(n)
+# memory complexity O(len(s))
