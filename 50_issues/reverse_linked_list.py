@@ -13,26 +13,28 @@ class ListNode:
 
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        # if not head:
-        #     return head
+        # FIRST DECISION OPTIMAL
+        if not head:
+            return head
 
-        # curr = head
-        # prev = None
+        curr = head
+        prev = None
 
-        # while curr:
-        #     # save next
-        #     curr_next = curr.next
+        while curr:
+            # save next
+            curr_next = curr.next
 
-        #     # reverse current
-        #     curr.next = prev
+            # reverse current
+            curr.next = prev
 
-        #     # shift pointers
-        #     prev = curr
-        #     curr = curr_next
+            # shift pointers
+            prev = curr
+            curr = curr_next
 
-        # # return prev because it's the head of the reversed list now
-        # return prev
+        # return prev because it's the head of the reversed list now
+        return prev
 
+        # SECOND DECISION
         if not head:
             return head
 
@@ -47,8 +49,13 @@ class Solution:
 
 
 sol = Solution()
+# FIRST DECISION
 # time complexity O(n)
-# memory complexity O(n) - stack
+# memory complexity O(1)
+
+# SECOND DECISION
+# time complexity O(n)
+# memory complexity O(h)
 
 node = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
 expected_node = ListNode(5, ListNode(4, ListNode(3, ListNode(2, ListNode(1)))))
@@ -73,3 +80,18 @@ def linked_list_to_list(head: Optional[ListNode]) -> list[int]:
 def test_reverseList(head, expected):
     result = sol.reverseList(head)
     assert linked_list_to_list(result) == expected
+
+
+# SECOND DECISION: test limit of python recursion, has to raise RecursionError
+def test_reverse_large_linked_list():
+    size = 5000
+
+    head = None
+
+    # Build a linked list: 1 -> 2 -> ... -> 5000.
+    for value in range(size, 0, -1):
+        head = ListNode(value, head)
+
+    result = Solution().reverseList(head)
+
+    assert linked_list_to_list(result) == list(range(size, 0, -1))

@@ -1,126 +1,112 @@
 import pytest
 
+from collections import Counter
+
 
 # https://leetcode.com/problems/intersection-of-two-arrays-ii/
 class Solution:
     def intersect(self, nums1: list[int], nums2: list[int]) -> list[int]:
-        # FIRST decision
+        """Hash map approach."""
+        counts1 = Counter(nums1)
+        counts2 = Counter(nums2)
 
-        map_1, map_2 = {}, {}
+        result = []
 
-        for i in nums1:
-            map_1[i] = 1 + map_1.get(i, 0)
+        for num, count in counts1.items():
+            result.extend([num] * min(count, counts2.get(num, 0)))
 
-        for i in nums2:
-            map_2[i] = 1 + map_2.get(i, 0)
+        return result
 
-        res = []
-        for k in map_1:
-            map_1_size = map_1[k]
-            map_2_size = map_2.get(k, 0)
+    def intersect_sorted(
+        self, nums1: list[int], nums2: list[int]
+    ) -> list[int]:
+        """Two pointers. Both input arrays must already be sorted."""
+        left, right = 0, 0
+        result = []
 
-            if not map_2_size:
-                continue
+        while left < len(nums1) and right < len(nums2):
+            if nums1[left] == nums2[right]:
+                result.append(nums1[left])
+                left += 1
+                right += 1
+            elif nums1[left] < nums2[right]:
+                left += 1
+            else:
+                right += 1
 
-            to_extend = [k] * min(map_1_size, map_2_size)
-            res.extend(to_extend)
+        return result
 
-        # Time:  O(n + m)
-        # Space: O(u1 + u2 + k), где u1/u2 — количество уникальных элементов + пересечение
-        return res
+    def intersect_from_disk(self, nums1, nums2_chunks):
+        """Process nums2 incrementally without loading it into memory."""
+        counts = Counter(nums1)
+        result = []
 
-        # SECOND decision
+        for chunk in nums2_chunks:
+            for num in chunk:
+                if counts[num] > 0:
+                    result.append(num)
+                    counts[num] -= 1
 
-        # first follow up:  if arrays are sorted - this algo with two pointers are optimized
-        #   than previouse one
+        return result
 
-        # second follow up: nums1's size small compared to nums2's size - this algo better
-        #   cause we will exit from the while loop after nums1 array will exhausted
+    def intersect_small_first(self, nums1: list[int], nums2: list[int]) -> list[int]:
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
 
-        # assume that input already sorted
-        nums1.sort()
-        nums2.sort()
+        counts = Counter(nums1)
+        result = []
 
-        l, r = 0, 0
-        res = []
+        for num in nums2:
+            if counts[num] > 0:
+                result.append(num)
+                counts[num] -= 1
 
-        while l < len(nums1) and r < len(nums2):
-            if nums1[l] == nums2[r]:
-                res.append(nums1[l])
-                l += 1
-                r += 1
-            elif nums1[l] < nums2[r]:
-                l += 1
-            elif nums1[l] > nums2[r]:
-                r += 1
-
-        return res
-
-        # THIRD FOLLOW-UP
-        #
-        # What if nums2 is stored on disk and the memory is limited,
-        # so we cannot load the entire array into memory?
-        #
-        # If nums1 is small enough to fit into memory, we can build
-        # a frequency map for nums1 and process nums2 in chunks.
-        #
-        # We never load the entire nums2 into memory.
-        # Instead, we read a small chunk, process it, and then move
-        # to the next chunk.
-        #
-        # Example:
-        #
-        # nums1 = [1, 2, 2, 3]
-        #
-        # nums2 is stored on disk:
-        # [10, 2, 7, 2, 8] -> [3, 100, 5] -> ...
-        #
-        # We keep only nums1's frequency map in memory:
-        # {
-        #     1: 1,
-        #     2: 2,
-        #     3: 1
-        # }
-        #
-        # Then we process nums2 chunk by chunk.
-
-        from collections import Counter
-
-        def intersect_from_disk(nums1, nums2_file):
-            counter = Counter(nums1)
-            result = []
-
-            # Read nums2 incrementally instead of loading the entire file.
-            for chunk in nums2_file:
-                for num in chunk:
-                    if counter[num] > 0:
-                        result.append(num)
-                        counter[num] -= 1
-
-            return result
+        return result
 
 
 sol = Solution()
 
 
-# FIRST decision
-# time complexity O(n + m)
-# memory complexity O(k) - intersections
+# Hash map approach:
+# Time: O(n + m)
+# Space: O(u1 + u2 + k)
 
-# SECOND decision
-# time complexity O(n)
-# memory complexity O(n) + O(nlogn) = O(n)
+# Two pointers (already sorted inputs):
+# Time: O(n + m)
+# Auxiliary space: O(1)
+# Output space: O(k)
 
-# THIRD FOLLOW-UP
-# time complexity O(len(nums1) + len(nums2))
-# memory complexity O(unique(nums1) + chunk_size)
+# Two pointers (sorting required):
+# Time: O(n log n + m log m)
+# Auxiliary space: O(n + m) worst case with Python's sort
+
+# Hash map for the smaller array:
+# Time: O(n + m)
+# Space: O(min(n, m) + k)
+
+# Disk-based processing:
+# Time: O(n + m)
+# Space: O(u1 + chunk_size + k)
 
 
 @pytest.mark.parametrize(
     "nums1, nums2, expected",
     [
-        ([1,2,2,1], [2,2], [2,2]),
-    ]
+        ([1, 2, 2, 1], [2, 2], [2, 2]),
+        ([4, 9, 5], [9, 4, 9, 8, 4], [4, 9]),
+        ([1, 2, 3], [4, 5, 6], []),
+        ([1, 1, 1], [1, 1], [1, 1]),
+        ([], [1, 2], []),
+    ],
 )
 def test_intersect(nums1, nums2, expected):
-    assert sol.intersect(nums1, nums2) == expected
+    assert sorted(sol.intersect(nums1, nums2)) == sorted(expected)
+
+    assert sorted(sol.intersect_sorted(sorted(nums1), sorted(nums2))) == sorted(expected)
+
+    assert sorted(sol.intersect_small_first(nums1, nums2)) == sorted(expected)
+
+    # Simulate disk chunks.
+    chunks = [nums2[i:i + 2] for i in range(0, len(nums2), 2)]
+
+    assert sorted(sol.intersect_from_disk(nums1, chunks)) == sorted(expected)

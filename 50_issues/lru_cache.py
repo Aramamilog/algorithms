@@ -11,8 +11,11 @@ class LRUCache:
         self.capacity = capacity
         self.cache = {} # key -> node
 
-        # dummy nodes to create linked list
-        # right = lru, left = most recently used
+        # Dummy nodes for the doubly linked list.
+        # left.next = LRU (least recently used)
+        # right.prev = MRU (most recently used)
+        # New or accessed nodes are moved before right.
+        # Eviction removes the node after left.
         self.left, self.right = Node(0, 0), Node(0, 0)
         self.left.next, self.right.prev = self.right, self.left
 

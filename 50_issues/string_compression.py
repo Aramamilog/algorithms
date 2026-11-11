@@ -38,10 +38,30 @@ sol = Solution()
 @pytest.mark.parametrize(
     "chars, expected",
     [
-        (["a","a","b","b","c","c","c"], 6),
-        (["a"], 1),
-        (["a","b","b","b","b","b","b","b","b","b","b","b","b"], 4)
-    ]
+        (
+            ["a", "a", "b", "b", "c", "c", "c"],
+            ["a", "2", "b", "2", "c", "3"],
+        ),
+        (
+            ["a"],
+            ["a"],
+        ),
+        (
+            ["a"] * 12,
+            ["a", "1", "2"],
+        ),
+        (
+            ["a", "b", "c"],
+            ["a", "b", "c"],
+        ),
+        (
+            ["a"] * 10 + ["b"] * 3,
+            ["a", "1", "0", "b", "3"],
+        ),
+    ],
 )
 def test_compress(chars, expected):
-    assert sol.compress(chars) == expected
+    k = sol.compress(chars)
+
+    assert k == len(expected)
+    assert chars[:k] == expected
